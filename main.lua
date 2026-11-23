@@ -1,27 +1,30 @@
 --=====================================================================
---  JDEV BLOX 🤫🌙  •  LAUNCHER
---  Adicione jogos na tabela GAMES abaixo: nome, desc, url do GitHub.
+--  JDEV BLOX 🤫🌙  •  LAUNCHER v3
+--  Adicione jogos na tabela GAMES: nome, desc, url.
 --=====================================================================
 local Players = game:GetService("Players")
 local Http = game:GetService("HttpService")
+local Tween = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 
 local GAMES = {
 	{
 		nome = "Blox Fruits",
 		desc = "farm · esp · frutas · teleporte",
-		url = "loadstring(game:HttpGet("https://raw.githubusercontent.com/ei284836-sys/main.lua/refs/heads/main/main.lua"))()",
+		url = "https://raw.githubusercontent.com/ei284836-sys/main.lua/refs/heads/main/main.lua",
+		fixo = true,
 	},
-	-- modelo para adicionar outro jogo:
+	-- modelo:
 	-- { nome = "Meu Jogo", desc = "o que faz", url = "https://raw.githubusercontent.com/user/repo/main/arquivo.lua" },
 }
 
 local C = {
-	bg = Color3.fromRGB(8, 7, 12), bg2 = Color3.fromRGB(14, 13, 20),
-	card = Color3.fromRGB(19, 18, 27), hover = Color3.fromRGB(30, 28, 42),
-	line = Color3.fromRGB(37, 34, 50), text = Color3.fromRGB(238, 236, 248),
-	dim = Color3.fromRGB(126, 122, 150), mute = Color3.fromRGB(78, 76, 96),
-	pur = Color3.fromRGB(166, 116, 255), cyan = Color3.fromRGB(130, 226, 255),
+	bg = Color3.fromRGB(7, 6, 11), bg2 = Color3.fromRGB(14, 12, 21),
+	card = Color3.fromRGB(18, 17, 26), card2 = Color3.fromRGB(24, 22, 34),
+	hover = Color3.fromRGB(30, 28, 43), line = Color3.fromRGB(37, 34, 50),
+	text = Color3.fromRGB(240, 238, 250), dim = Color3.fromRGB(126, 122, 150),
+	mute = Color3.fromRGB(76, 74, 94), pur = Color3.fromRGB(168, 116, 255),
+	blue = Color3.fromRGB(96, 168, 255), cyan = Color3.fromRGB(130, 226, 255),
 	good = Color3.fromRGB(96, 228, 152), bad = Color3.fromRGB(255, 96, 112),
 }
 
@@ -45,6 +48,11 @@ local function pad(o, a, b, c, d)
 		PaddingBottom = UDim.new(0, c or 0), PaddingLeft = UDim.new(0, d or 0),
 	}, o)
 end
+local function grad(o, a, b, rot)
+	local g = new("UIGradient", { Rotation = rot or 90 }, o)
+	pcall(function() g.Color = ColorSequence.new(a, b) end)
+	return g
+end
 
 local Player = Players.LocalPlayer
 local PGui = Player:WaitForChild("PlayerGui")
@@ -56,18 +64,64 @@ local Gui = new("ScreenGui", {
 	DisplayOrder = 999998, ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 }, PGui)
 
-local s = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1280, 720)
-local W = math.clamp(s.X - 70, 300, 400)
-local H = math.clamp(s.Y - 180, 320, 460)
+--==================== EMBLEMA =========================================
+local function emblem(parent, size)
+	local b = new("Frame", {
+		Size = UDim2.fromOffset(size, size), BackgroundColor3 = Color3.fromRGB(6, 5, 11),
+		BorderSizePixel = 0, ClipsDescendants = true,
+	}, parent)
+	corner(b, math.floor(size * 0.26))
+	local ring = new("Frame", { Size = UDim2.fromScale(0.92, 0.92), Position = UDim2.fromScale(0.04, 0.04), BackgroundTransparency = 1 }, b)
+	corner(ring, 999)
+	grad(stroke(ring, C.pur, 1, 0.05), C.pur, C.blue, 45)
+	local moon = new("Frame", {
+		Size = UDim2.fromScale(0.52, 0.52), Position = UDim2.fromScale(0.22, 0.25),
+		BackgroundColor3 = Color3.fromRGB(120, 196, 255), BorderSizePixel = 0,
+	}, b)
+	corner(moon, 999)
+	grad(moon, Color3.fromRGB(170, 226, 255), Color3.fromRGB(62, 108, 255), 120)
+	local bite = new("Frame", {
+		Size = UDim2.fromScale(0.48, 0.48), Position = UDim2.fromScale(0.37, 0.21),
+		BackgroundColor3 = Color3.fromRGB(6, 5, 11), BorderSizePixel = 0,
+	}, b)
+	corner(bite, 999)
+	local h1 = new("Frame", { Size = UDim2.fromScale(0.66, 0.075), Position = UDim2.fromScale(0.17, 0.462), BackgroundColor3 = Color3.fromRGB(238, 222, 255), BorderSizePixel = 0 }, b)
+	corner(h1, 999)
+	local v1 = new("Frame", { Size = UDim2.fromScale(0.075, 0.66), Position = UDim2.fromScale(0.462, 0.17), BackgroundColor3 = Color3.fromRGB(238, 222, 255), BorderSizePixel = 0 }, b)
+	corner(v1, 999)
+	local core = new("Frame", { Size = UDim2.fromScale(0.15, 0.15), Position = UDim2.fromScale(0.425, 0.425), BackgroundColor3 = Color3.new(1, 1, 1), BorderSizePixel = 0 }, b)
+	corner(core, 999)
+	local fl = new("Frame", { Size = UDim2.fromScale(0.08, 0.12), Position = UDim2.fromScale(0.46, 0.04), Rotation = 45, BackgroundColor3 = C.pur, BorderSizePixel = 0 }, b)
+	corner(fl, 2)
+	local s1 = new("Frame", { Size = UDim2.fromScale(0.075, 0.075), Position = UDim2.fromScale(0.01, 0.462), Rotation = 45, BackgroundColor3 = C.blue, BorderSizePixel = 0 }, b)
+	corner(s1, 2)
+	local s2 = new("Frame", { Size = UDim2.fromScale(0.075, 0.075), Position = UDim2.fromScale(0.915, 0.462), Rotation = 45, BackgroundColor3 = C.blue, BorderSizePixel = 0 }, b)
+	corner(s2, 2)
+	return b
+end
+
+--==================== JANELA ==========================================
+local vp = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1280, 720)
+local W = math.clamp(vp.X - 60, 310, 430)
+local H = math.clamp(vp.Y - 150, 340, 520)
 
 local Win = new("Frame", {
 	Size = UDim2.fromOffset(W, H), Position = UDim2.new(0.5, 0, 0.5, 0),
 	AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = C.bg, ClipsDescendants = true,
 }, Gui)
-corner(Win, 16)
-stroke(Win, C.pur, 1, 0.25)
+corner(Win, 18)
+grad(stroke(Win, C.pur, 1, 0.22), C.pur, C.cyan, 45)
+grad(Win, C.bg2, C.bg, 90)
 
-local Head = new("Frame", { Size = UDim2.new(1, 0, 0, 78), BackgroundTransparency = 1 }, Win)
+local glow = new("Frame", {
+	Size = UDim2.fromOffset(W + 12, H + 12), Position = UDim2.new(0.5, 0, 0.5, 0),
+	AnchorPoint = Vector2.new(0.5, 0.5), BackgroundColor3 = C.pur,
+	BackgroundTransparency = 0.87, ZIndex = 0,
+}, Gui)
+corner(glow, 22)
+Win.ZIndex = 1
+
+local Head = new("Frame", { Size = UDim2.new(1, 0, 0, 92), BackgroundTransparency = 1, ZIndex = 2 }, Win)
 local dragging, st, org
 Head.InputBegan:Connect(function(i)
 	if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
@@ -82,196 +136,279 @@ UIS.InputChanged:Connect(function(i)
 	if i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch then
 		local d = i.Position - st
 		Win.Position = UDim2.fromOffset(org.X.Offset + d.X, org.Y.Offset + d.Y)
+		glow.Position = UDim2.fromOffset(org.X.Offset + d.X + 6, org.Y.Offset + d.Y + 6)
 	end
 end)
 
+local logo = emblem(Head, 48)
+logo.Position = UDim2.fromOffset(18, 18)
+
 new("TextLabel", {
-	Text = "JDEV BLOX🤫🌙", Font = Enum.Font.GothamBold, TextSize = 17, TextColor3 = C.text,
-	BackgroundTransparency = 1, Size = UDim2.new(1, -40, 0, 20), Position = UDim2.fromOffset(16, 16),
-	TextXAlignment = Enum.TextXAlignment.Left,
+	Text = "JDEV BLOX🤫🌙", Font = Enum.Font.GothamBold, TextSize = 18, TextColor3 = C.text,
+	BackgroundTransparency = 1, Size = UDim2.new(1, -100, 0, 21), Position = UDim2.fromOffset(76, 18),
+	TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 3,
 }, Head)
 new("TextLabel", {
-	Text = "escolha o jogo", Font = Enum.Font.Gotham, TextSize = 10, TextColor3 = C.mute,
-	BackgroundTransparency = 1, Size = UDim2.new(1, -40, 0, 14), Position = UDim2.fromOffset(16, 37),
-	TextXAlignment = Enum.TextXAlignment.Left,
+	Text = "selecione um jogo para executar", Font = Enum.Font.Gotham, TextSize = 10,
+	TextColor3 = C.mute, BackgroundTransparency = 1, Size = UDim2.new(1, -100, 0, 14),
+	Position = UDim2.fromOffset(76, 40), TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 3,
 }, Head)
 
-local addBtn = new("TextButton", {
-	Text = "+ jogo", Font = Enum.Font.GothamSemibold, TextSize = 10, TextColor3 = C.pur,
-	BackgroundColor3 = C.card, Size = UDim2.fromOffset(62, 22), Position = UDim2.fromOffset(16, 54),
-	AutoButtonColor = false, BorderSizePixel = 0,
+local ver = new("Frame", {
+	Size = UDim2.fromOffset(30, 15), Position = UDim2.fromOffset(76, 58),
+	BackgroundColor3 = C.pur, BackgroundTransparency = 0.75, BorderSizePixel = 0, ZIndex = 3,
 }, Head)
-corner(addBtn, 7)
+corner(ver, 4)
+new("TextLabel", {
+	Text = "V3", Font = Enum.Font.GothamBold, TextSize = 9, TextColor3 = C.pur,
+	BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), ZIndex = 3,
+}, ver)
+
 local closeBtn = new("TextButton", {
-	Text = "×", Font = Enum.Font.GothamBold, TextSize = 16, TextColor3 = C.dim,
-	BackgroundColor3 = C.card, Size = UDim2.fromOffset(26, 26), Position = UDim2.new(1, -38, 0, 16),
-	AutoButtonColor = false, BorderSizePixel = 0,
+	Text = "×", Font = Enum.Font.GothamBold, TextSize = 17, TextColor3 = C.dim,
+	BackgroundColor3 = C.card, Size = UDim2.fromOffset(28, 28), Position = UDim2.new(1, -40, 0, 18),
+	AutoButtonColor = false, BorderSizePixel = 0, ZIndex = 3,
 }, Head)
-corner(closeBtn, 8)
-closeBtn.MouseButton1Click:Connect(function() Gui:Destroy() end)
+corner(closeBtn, 9)
+closeBtn.MouseButton1Click:Connect(function()
+	Gui:Destroy()
+end)
 
-new("Frame", { Size = UDim2.new(1, 0, 0, 1), Position = UDim2.new(0, 0, 0, 78), BackgroundColor3 = C.pur, BorderSizePixel = 0 }, Win)
+new("Frame", { Size = UDim2.new(1, 0, 0, 1), Position = UDim2.new(0, 0, 0, 92), BackgroundColor3 = C.pur, BorderSizePixel = 0, ZIndex = 2 }, Win)
 
 local List = new("ScrollingFrame", {
-	Size = UDim2.new(1, -24, 1, -96), Position = UDim2.fromOffset(12, 88),
+	Size = UDim2.new(1, -26, 1, -152), Position = UDim2.fromOffset(13, 103),
 	BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 2,
-	ScrollBarImageColor3 = C.pur, CanvasSize = UDim2.fromOffset(0, 0),
+	ScrollBarImageColor3 = C.pur, CanvasSize = UDim2.fromOffset(0, 0), ZIndex = 2,
 }, Win)
 new("UIListLayout", { Padding = UDim.new(0, 7) }, List)
 
-local noteBox = new("TextLabel", {
-	Size = UDim2.new(1, -24, 0, 26), Position = UDim2.new(0, 12, 1, -34),
-	BackgroundColor3 = C.card, Text = "", Font = Enum.Font.GothamMedium, TextSize = 10,
-	TextColor3 = C.dim, BorderSizePixel = 0, Visible = false,
+local Foot = new("Frame", {
+	Size = UDim2.new(1, 0, 0, 44), Position = UDim2.new(0, 0, 1, -44),
+	BackgroundColor3 = C.bg2, BorderSizePixel = 0, ZIndex = 2,
 }, Win)
-corner(noteBox, 7)
+new("Frame", { Size = UDim2.new(1, 0, 0, 1), BackgroundColor3 = C.line, BorderSizePixel = 0 }, Foot)
+local status = new("TextLabel", {
+	Text = "pronto", Font = Enum.Font.Code, TextSize = 9, TextColor3 = C.mute,
+	BackgroundTransparency = 1, Size = UDim2.new(1, -110, 1, 0), Position = UDim2.fromOffset(13, 0),
+	TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 3,
+}, Foot)
 
-local function note(t, bad)
-	noteBox.Text = t
-	noteBox.TextColor3 = bad and C.bad or C.good
-	noteBox.Visible = true
-	task.delay(3.5, function() noteBox.Visible = false end)
+local function setStatus(t, bad)
+	status.Text = t
+	status.TextColor3 = bad and C.bad or C.good
 end
 
---==================== ADICIONAR JOGO ==================================
+local addBtn = new("TextButton", {
+	Text = "+ jogo", Font = Enum.Font.GothamSemibold, TextSize = 10, TextColor3 = C.pur,
+	BackgroundColor3 = C.card, Size = UDim2.fromOffset(80, 26), Position = UDim2.new(1, -93, 0, 9),
+	AutoButtonColor = false, BorderSizePixel = 0, ZIndex = 3,
+}, Foot)
+corner(addBtn, 8)
+
+--==================== FORMULÁRIO ======================================
 local form = new("Frame", {
-	Size = UDim2.new(1, -24, 0, 0), Position = UDim2.fromOffset(12, 88),
-	BackgroundColor3 = C.bg2, Visible = false, ClipsDescendants = true,
+	Size = UDim2.new(1, -26, 0, 0), Position = UDim2.fromOffset(13, 103),
+	BackgroundColor3 = C.bg2, ClipsDescendants = true, Visible = false, ZIndex = 4,
 }, Win)
-corner(form, 10)
-stroke(form, C.pur, 1, 0.3)
-pad(form, 10, 10, 10, 10)
+corner(form, 12)
+stroke(form, C.pur, 1, 0.25)
+pad(form, 11, 11, 11, 11)
 
 local nameBox = new("TextBox", {
-	Size = UDim2.new(1, 0, 0, 28), BackgroundColor3 = C.card, Text = "",
+	Size = UDim2.new(1, 0, 0, 30), BackgroundColor3 = C.card, Text = "",
 	PlaceholderText = "nome do jogo", PlaceholderColor3 = C.mute,
 	Font = Enum.Font.GothamMedium, TextSize = 11, TextColor3 = C.text,
-	ClearTextOnFocus = false, BorderSizePixel = 0,
+	ClearTextOnFocus = false, BorderSizePixel = 0, ZIndex = 5,
 }, form)
-corner(nameBox, 7)
-pad(nameBox, 0, 8, 0, 8)
+corner(nameBox, 8)
+pad(nameBox, 0, 9, 0, 9)
 
 local urlBox = new("TextBox", {
-	Size = UDim2.new(1, 0, 0, 28), Position = UDim2.fromOffset(0, 34), BackgroundColor3 = C.card,
+	Size = UDim2.new(1, 0, 0, 30), Position = UDim2.fromOffset(0, 36), BackgroundColor3 = C.card,
 	Text = "", PlaceholderText = "link raw do github (.lua)", PlaceholderColor3 = C.mute,
 	Font = Enum.Font.GothamMedium, TextSize = 10, TextColor3 = C.text,
-	ClearTextOnFocus = false, BorderSizePixel = 0,
+	ClearTextOnFocus = false, BorderSizePixel = 0, ZIndex = 5,
 }, form)
-corner(urlBox, 7)
-pad(urlBox, 0, 8, 0, 8)
+corner(urlBox, 8)
+pad(urlBox, 0, 9, 0, 9)
 
 local saveBtn = new("TextButton", {
-	Text = "salvar", Font = Enum.Font.GothamSemibold, TextSize = 11, TextColor3 = Color3.new(1, 1, 1),
-	BackgroundColor3 = C.pur, Size = UDim2.new(1, 0, 0, 28), Position = UDim2.fromOffset(0, 68),
-	AutoButtonColor = false, BorderSizePixel = 0,
+	Text = "salvar jogo", Font = Enum.Font.GothamSemibold, TextSize = 11, TextColor3 = Color3.new(1, 1, 1),
+	BackgroundColor3 = C.pur, Size = UDim2.new(1, 0, 0, 30), Position = UDim2.fromOffset(0, 72),
+	AutoButtonColor = false, BorderSizePixel = 0, ZIndex = 5,
 }, form)
-corner(saveBtn, 7)
+corner(saveBtn, 8)
 
---==================== LISTA ===========================================
+--==================== DOWNLOAD ========================================
+local function fetch(url)
+	local libs = {}
+	if syn and syn.request then table.insert(libs, syn.request) end
+	if http and http.request then table.insert(libs, http.request) end
+	if http_request then table.insert(libs, http_request) end
+	if request then table.insert(libs, request) end
+	if fluxus and fluxus.request then table.insert(libs, fluxus.request) end
+
+	for _, fn in ipairs(libs) do
+		local ok, r = pcall(fn, { Url = url, Method = "GET" })
+		if ok and type(r) == "table" and type(r.Body) == "string" then
+			return r.Body, nil
+		end
+	end
+	local ok, b = pcall(function() return game:HttpGet(url) end)
+	if ok and type(b) == "string" then return b, nil end
+	return nil, tostring(b)
+end
+
 local function save()
 	if writefile then
-		pcall(function() writefile("jdev_games.json", Http:JSONEncode(GAMES)) end)
+		local out = {}
+		for _, g in ipairs(GAMES) do
+			if not g.fixo then table.insert(out, { nome = g.nome, desc = g.desc, url = g.url }) end
+		end
+		pcall(function() writefile("jdev_games.json", Http:JSONEncode(out)) end)
 	end
 end
 
-local function carregar(g, card, tag, tagLbl)
+local function executar(g, card, badge, badgeLbl)
 	if g._busy then return end
 	g._busy = true
 	card.BackgroundColor3 = C.hover
-	tag.BackgroundColor3 = C.pur
-	tagLbl.Text = "..."
-	tagLbl.TextColor3 = Color3.new(1, 1, 1)
-	note("carregando " .. g.nome, false)
+	badge.BackgroundColor3 = C.pur
+	badgeLbl.Text = "..."
+	badgeLbl.TextColor3 = Color3.new(1, 1, 1)
+	setStatus("baixando " .. g.nome, false)
 
 	task.spawn(function()
-		local ok, body = pcall(function() return game:HttpGet(g.url) end)
-		if not ok or not body or #body < 80 then
+		local body, err = fetch(g.url .. (g.url:find("%?") and "&" or "?") .. "t=" .. os.time())
+		if not body then
 			g._busy = false
-			tag.BackgroundColor3 = C.bad
-			tagLbl.Text = "ERRO"
-			note("falha no download de " .. g.nome, true)
+			badge.BackgroundColor3 = C.bad
+			badgeLbl.Text = "ERRO"
+			setStatus("download falhou: " .. tostring(err), true)
+			return
+		end
+		if #body < 80 or body:sub(1, 1) == "<" then
+			g._busy = false
+			badge.BackgroundColor3 = C.bad
+			badgeLbl.Text = "ERRO"
+			setStatus("resposta inválida (" .. #body .. " bytes)", true)
 			return
 		end
 		body = body:gsub("^\239\187\191", ""):gsub("```[%a]*", "")
-		local fn, err = loadstring(body)
+		local fn, cerr = loadstring(body)
 		if not fn then
 			g._busy = false
-			tag.BackgroundColor3 = C.bad
-			tagLbl.Text = "ERRO"
-			note("compilação: " .. tostring(err), true)
+			badge.BackgroundColor3 = C.bad
+			badgeLbl.Text = "ERRO"
+			setStatus("compilação: " .. tostring(cerr), true)
 			return
 		end
 		local okr, rerr = pcall(fn)
 		if not okr then
 			g._busy = false
-			tag.BackgroundColor3 = C.bad
-			tagLbl.Text = "ERRO"
-			note("execução: " .. tostring(rerr), true)
+			badge.BackgroundColor3 = C.bad
+			badgeLbl.Text = "ERRO"
+			setStatus("execução: " .. tostring(rerr), true)
 			return
 		end
 		Gui:Destroy()
 	end)
 end
 
+--==================== LISTA ===========================================
 local function build()
 	for _, c in ipairs(List:GetChildren()) do
 		if c:IsA("TextButton") then c:Destroy() end
 	end
-	for _, g in ipairs(GAMES) do
+	for i, g in ipairs(GAMES) do
 		local card = new("TextButton", {
-			Text = "", BackgroundColor3 = C.card, Size = UDim2.new(1, 0, 0, 62),
-			AutoButtonColor = false, BorderSizePixel = 0,
+			Text = "", BackgroundColor3 = C.card, Size = UDim2.new(1, 0, 0, 70),
+			AutoButtonColor = false, BorderSizePixel = 0, ZIndex = 2,
 		}, List)
-		corner(card, 11)
+		corner(card, 12)
 		stroke(card, C.line, 1, 0.55)
+		local ic = new("Frame", {
+			Size = UDim2.fromOffset(38, 38), Position = UDim2.fromOffset(13, 16),
+			BackgroundColor3 = C.card2, BorderSizePixel = 0, ZIndex = 3,
+		}, card)
+		corner(ic, 10)
+		new("TextLabel", {
+			Text = "★", Font = Enum.Font.GothamBold, TextSize = 15, TextColor3 = C.pur,
+			BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), ZIndex = 3,
+		}, ic)
 		new("TextLabel", {
 			Text = g.nome, Font = Enum.Font.GothamBold, TextSize = 13, TextColor3 = C.text,
-			BackgroundTransparency = 1, Size = UDim2.new(1, -96, 0, 18), Position = UDim2.fromOffset(14, 12),
-			TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd,
+			BackgroundTransparency = 1, Size = UDim2.new(1, -150, 0, 18), Position = UDim2.fromOffset(60, 15),
+			TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 3,
 		}, card)
 		new("TextLabel", {
 			Text = g.desc or "", Font = Enum.Font.Gotham, TextSize = 10, TextColor3 = C.mute,
-			BackgroundTransparency = 1, Size = UDim2.new(1, -96, 0, 14), Position = UDim2.fromOffset(14, 32),
-			TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd,
+			BackgroundTransparency = 1, Size = UDim2.new(1, -150, 0, 14), Position = UDim2.fromOffset(60, 35),
+			TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 3,
 		}, card)
-		local tag = new("Frame", {
-			Size = UDim2.fromOffset(58, 20), Position = UDim2.new(1, -70, 0, 21),
-			BackgroundColor3 = C.pur, BorderSizePixel = 0,
+		local badge = new("Frame", {
+			Size = UDim2.fromOffset(62, 22), Position = UDim2.new(1, -74, 0, 24),
+			BackgroundColor3 = C.pur, BorderSizePixel = 0, ZIndex = 3,
 		}, card)
-		corner(tag, 6)
-		local tagLbl = new("TextLabel", {
+		corner(badge, 7)
+		local badgeLbl = new("TextLabel", {
 			Text = "EXECUTAR", Font = Enum.Font.GothamBold, TextSize = 8, TextColor3 = Color3.new(1, 1, 1),
-			BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1),
-		}, tag)
-		card.MouseEnter:Connect(function() card.BackgroundColor3 = C.hover end)
+			BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), ZIndex = 3,
+		}, badge)
+		card.MouseEnter:Connect(function()
+			if not g._busy then card.BackgroundColor3 = C.hover end
+		end)
 		card.MouseLeave:Connect(function()
 			if not g._busy then card.BackgroundColor3 = C.card end
 		end)
-		card.MouseButton1Click:Connect(function() carregar(g, card, tag, tagLbl) end)
+		card.MouseButton1Click:Connect(function() executar(g, card, badge, badgeLbl) end)
+
+		if not g.fixo then
+			local rm = new("TextButton", {
+				Text = "×", Font = Enum.Font.GothamBold, TextSize = 12, TextColor3 = C.mute,
+				BackgroundColor3 = C.card2, Size = UDim2.fromOffset(18, 18),
+				Position = UDim2.new(1, -22, 0, 8), AutoButtonColor = false,
+				BorderSizePixel = 0, ZIndex = 4,
+			}, card)
+			corner(rm, 5)
+			rm.MouseButton1Click:Connect(function()
+				table.remove(GAMES, i)
+				save()
+				build()
+				setStatus("jogo removido", false)
+			end)
+		end
 	end
-	List.CanvasSize = UDim2.fromOffset(0, #GAMES * 69 + 4)
+	List.CanvasSize = UDim2.fromOffset(0, #GAMES * 77 + 4)
 end
 
 addBtn.MouseButton1Click:Connect(function()
-	form.Visible = not form.Visible
-	TweenService = game:GetService("TweenService")
-	game:GetService("TweenService"):Create(form, TweenInfo.new(0.18), { Size = UDim2.new(1, -24, 0, form.Visible and 108 or 0) }):Play()
+	local open = not form.Visible
+	form.Visible = open
+	Tween:Create(form, TweenInfo.new(0.18), { Size = UDim2.new(1, -26, 0, open and 114 or 0) }):Play()
+	if open then
+		List.Visible = false
+	else
+		task.delay(0.19, function()
+			if not form.Visible then List.Visible = true end
+		end)
+	end
 end)
 
 saveBtn.MouseButton1Click:Connect(function()
-	local n = nameBox.Text
-	local u = urlBox.Text
-	if n == "" or u == "" then return note("preencha nome e link", true) end
+	local n, u = nameBox.Text, urlBox.Text
+	if n == "" or u == "" then return setStatus("preencha nome e link", true) end
 	table.insert(GAMES, { nome = n, desc = "adicionado por você", url = u })
 	nameBox.Text = ""
 	urlBox.Text = ""
 	form.Visible = false
+	List.Visible = true
 	save()
 	build()
-	note("jogo adicionado", false)
+	setStatus("jogo adicionado", false)
 end)
 
--- carrega jogos salvos pelo usuário
 if readfile and isfile then
 	pcall(function()
 		if isfile("jdev_games.json") then
@@ -286,3 +423,4 @@ if readfile and isfile then
 end
 
 build()
+setStatus("pronto · " .. tostring(#GAMES) .. " jogo(s)", false)
