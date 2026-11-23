@@ -10,7 +10,7 @@ local GAMES = {
 	{
 		nome = "Blox Fruits",
 		desc = "farm · esp · frutas · teleporte",
-		url = "https://raw.githubusercontent.com/ei284836-sys/scriptbloxfruitslua/refs/heads/main/bloxfruits.lua",
+		url = "loadstring(game:HttpGet("https://raw.githubusercontent.com/ei284836-sys/main.lua/refs/heads/main/main.lua"))()",
 	},
 	-- modelo para adicionar outro jogo:
 	-- { nome = "Meu Jogo", desc = "o que faz", url = "https://raw.githubusercontent.com/user/repo/main/arquivo.lua" },
